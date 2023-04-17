@@ -4,5 +4,4 @@ youtube_transcript_api
 moviepy
 ffmpeg
 pytube
-biopython
-audalign
+librosa

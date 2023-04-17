@@ -40,14 +40,16 @@ def _get_yt_transcripts(url: str):
 
 
 def _translate_en_2_new_lang(text: list, lang: str = 'es'):
-    """_summary_
+    """Translates transcriptions/text to target language
 
     Args:
-        lang (str, optional): _description_. Defaults to 'es'.
+        text (list): List of transcriptions/text
+        lang (str, optional): Target language of conversion. Defaults to 'es'.
 
     Returns:
-        str: _description_
+        str: List of translated transcriptions/text
     """
+  
     if text == []:
         return text
     translator = Translator()
@@ -58,8 +60,20 @@ def _translate_en_2_new_lang(text: list, lang: str = 'es'):
     return translated_text
 
 
+def _get_voice_from_video(video_file):
+    url = f'https://api.elevenlabs.io/v1/voices/add'
+    payload = {
+            "name": "yeonmi_park",
+            "files": video_file
+        }
+    r = requests.post(url,
+                      headers={"xi-api-key": XI_API_KEY},
+                      data=json.dumps(payload))
+    return r.content
+
+
 def _translated_tts(text: list):
-    """_summary_
+    """Generates and writes audio clips for the given list of texts
 
     Args:
         text (list): list of translated text
@@ -86,11 +100,12 @@ def _translated_tts(text: list):
 
 
 def _combine_align_translated_audios(audio_files_path: str, end_times: list):
-    """_summary_
+    """Combines the audio clips into a single wav file
 
     Args:
-        audio_files_path (str): _description_
-        start_times (list): _description_
+        audio_files_path (str): path to the audio clips
+        end_times (list): list of end times of transcriptions for each clip
+           
     """
 
     clip_files = sorted(
@@ -127,24 +142,25 @@ def _combine_align_translated_audios(audio_files_path: str, end_times: list):
 
     # Export the combined clip to a new audio file
     combined_clip.export('combined.wav', format='wav')
-    return len(combined_clip)/1000
 
 
 def _duration_of_audio(audio_file):
+    """Returns the duration in seconds of the given audio file
+
+    Args:
+        audio_file (str): path to the audio file
+
+    Returns:
+        float: duration in seconds of the given audio file
+    """
     return librosa.get_duration(filename= audio_file)
-    
-# def _convert_wav_to_mp3(audio_file, mp3_path):
-#     sound = AudioSegment.from_wav(audio_file)
-#     sound.export(mp3_path, format="mp3")
+
 
 def _download_youtube_video(video_url):
-    """_summary_
+    """Download the Youtube video from its URL
 
     Args:
         video_url (str): Youtube video URL
-
-    Returns:
-        _type_: _description_
     """
     # Create a YouTube object
     yt = YouTube(video_url)
@@ -154,10 +170,16 @@ def _download_youtube_video(video_url):
 
     # Download the video to the current directory
     stream.download(filename="sample_video.mp4")
-    return None
 
 
 def _silent_youtube_video(video_file_path, output_silent_video_path, duration_in_sec):
+    """Strips audio from the video, trims to the given length and saves in the specified path
+
+    Args:
+        video_file_path (str): path to the video file
+        output_silent_video_path (str): output path of the silenced video
+        duration_in_sec (float): duration of video to keep
+    """
     video = VideoFileClip(video_file_path)
     # Trim the first 5 seconds of the video
     video = video.subclip(0, duration_in_sec)
@@ -166,17 +188,14 @@ def _silent_youtube_video(video_file_path, output_silent_video_path, duration_in
 
 
 def _stitch_audio_to_video(audio_file_path: str, silent_video_file_path: str, dubbed_video_path: str):
-    """_summary_
+    """Stitches the audio onto the video and saves at the specified location
 
     Args:
-        audio_file_path (str): _description_
-        video_file_path (str): _description_
-
-    Returns:
-        _type_: _description_
+        audio_file_path (str): path to the audio file
+        silent_video_file_path (str): path to the video file
+        dubbed_video_path (str): path of the combined video to write
     """
     audio = ffmpeg.input(audio_file_path)
     video = ffmpeg.input(silent_video_file_path)
     ffmpeg.output(audio, video, dubbed_video_path).run()
 
-    return None
