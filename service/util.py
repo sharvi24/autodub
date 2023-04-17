@@ -133,9 +133,9 @@ def _combine_align_translated_audios(audio_files_path: str, end_times: list):
 def _duration_of_audio(audio_file):
     return librosa.get_duration(filename= audio_file)
     
-def _convert_wav_to_mp3(audio_file, mp3_path):
-    sound = AudioSegment.from_wav(audio_file)
-    sound.export(mp3_path, format="mp3")
+# def _convert_wav_to_mp3(audio_file, mp3_path):
+#     sound = AudioSegment.from_wav(audio_file)
+#     sound.export(mp3_path, format="mp3")
 
 def _download_youtube_video(video_url):
     """_summary_

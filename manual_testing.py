@@ -1,5 +1,5 @@
 from service import AIDub
-from service.util import _stitch_audio_to_video, _get_yt_transcripts, _translate_en_2_new_lang, _translated_tts, _combine_align_translated_audios, _download_youtube_video, _silent_youtube_video, _duration_of_audio, _convert_wav_to_mp3
+from service.util import _stitch_audio_to_video, _get_yt_transcripts, _translate_en_2_new_lang, _translated_tts, _combine_align_translated_audios, _download_youtube_video, _silent_youtube_video, _duration_of_audio
 
 
 def main():
@@ -13,7 +13,7 @@ def main():
     #_translated_tts(translated_transcripts)
     
     #_combine_align_translated_audios("/Users/sharvitomar/Desktop/Sem4/deeptune/Autodub/translated_audio_clips",all_ends)
-    #audio_file_path = "/Users/sharvitomar/Desktop/Sem4/deeptune/Autodub/combined.wav"
+    audio_file_path = "/Users/sharvitomar/Desktop/Sem4/deeptune/Autodub/combined.wav"
     # duration_in_sec = _duration_of_audio(audio_file_path)
     
     #_download_youtube_video(youtube_url)
@@ -22,12 +22,8 @@ def main():
     output_silent_video_path = "/Users/sharvitomar/Desktop/Sem4/deeptune/Autodub/silent.mp4"
     # _silent_youtube_video(video_file_path, output_silent_video_path, duration_in_sec)
     
-    mp3_file_path = "/Users/sharvitomar/Desktop/Sem4/deeptune/Autodub/combined.mp3"
-    #_convert_wav_to_mp3(audio_file_path, mp3_file_path)
-    #silent_video_file_path = "/Users/sharvitomar/Desktop/Sem4/deeptune/Autodub/silent.mp4"
-    
     dubbed_video_path = "/Users/sharvitomar/Desktop/Sem4/deeptune/Autodub/dubbed_video.mp4"
-    _stitch_audio_to_video(mp3_file_path, output_silent_video_path,dubbed_video_path)
+    _stitch_audio_to_video(audio_file_path, output_silent_video_path,dubbed_video_path)
 
 
 if __name__ == '__main__':
