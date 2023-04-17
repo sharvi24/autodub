@@ -1,13 +1,21 @@
 from googletrans import Translator
 from moviepy.editor import VideoFileClip
+from pydub import AudioSegment
 from pytube import YouTube
+from service.util_constants import *
 from urllib.parse import urlparse, parse_qs
 from youtube_transcript_api import YouTubeTranscriptApi
+
 import ffmpeg
+import glob
 import json
-import requests
-from pydub import AudioSegment
+import librosa
 import os
+import requests
+
+
+REPO = os.getcwd()
+
 
 def _get_yt_transcripts(url: str):
     """ gets youtube transcripts using url
@@ -45,34 +53,35 @@ def _translate_en_2_new_lang(text: list, lang: str = 'es'):
     translator = Translator()
     translated_text = []
     for text_sample in text:
-        #import logging; logging.warn(f'text_sample = {text_sample}') 
-        translated_text.append(translator.translate(text_sample, dest=lang).text)
+        translated_text.append(
+            translator.translate(text_sample, dest=lang).text)
     return translated_text
-    
 
-def _translated_tts(text: str):
+
+def _translated_tts(text: list):
     """_summary_
 
     Args:
-        text (str): translated text
+        text (list): list of translated text
     """
     voice_id = '21m00Tcm4TlvDq8ikWAM'
     url = f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}'
-    i = 0 
+    i = 0
     for text_sample in text:
-        
         payload = {
             "text": text_sample,
             "voice_settings": {
                 "stability": 0,
-                "similarity_boost": 0 
-                }
+                "similarity_boost": 0
             }
-        r = requests.post(url, data=json.dumps(payload))
-        name = str(i) + ".wav"
-        with open(name, mode='bx') as f:
+        }
+        r = requests.post(url,
+                          headers={"xi-api-key": XI_API_KEY},
+                          data=json.dumps(payload))
+        file_name = f'{REPO}/translated_audio_clips/{str(i)}.wav'
+        with open(file_name, mode='bx') as f:
             f.write(r.content)
-        i += 1    
+        i += 1
     return None
 
 
@@ -83,47 +92,51 @@ def _combine_align_translated_audios(audio_files_path: str, end_times: list):
         audio_files_path (str): _description_
         start_times (list): _description_
     """
+
+    clip_files = sorted(
+        glob.glob(f'{REPO}/translated_audio_clips/*.wav'),
+        key=os.path.getmtime
+    )
+    clip_files = clip_files[0:63]
+    end_times = end_times[0:63]
     
-    all_files = []
-    for filename in os.listdir(audio_files_path):
-        # Get the full path of the file
-        all_files.append(os.path.join(audio_files_path, filename))
-    
-    # List of audio clip file paths
-    clip_files = sorted(all_files)
-    
-    # Load each audio clip and store the start time in a list
+    # # Load each audio clip and store the start time in a list
     clips = []
-    clip_files = clip_files[1:6]
-    
+
     for clip_file in clip_files:
         clip = AudioSegment.from_file(clip_file)
         clips.append(clip)
 
-    end_times = end_times[0:4]
-
     # Combine the clips by appending them one after another
     combined_clip = clips[0]
     last_length = len(clips[0])
-    
+
     clips = clips[1:]
- 
+
     for clip, end_time in zip(clips, end_times):
         print(last_length, end_time)
         if last_length >= end_time:
-                combined_clip += clip
+            combined_clip += clip
         else:
-            print("inside adding silence")
-            silence_duration = (end_time - last_length) 
-            padded_clip =  clip + AudioSegment.silent(duration=silence_duration)
+            #print("inside adding silence")
+            silence_duration = (end_time - last_length)
+            padded_clip = clip + AudioSegment.silent(duration=silence_duration)
             combined_clip += padded_clip
-            
+
         last_length = len(combined_clip)
 
     # Export the combined clip to a new audio file
     combined_clip.export('combined.wav', format='wav')
+    return len(combined_clip)/1000
+
+
+def _duration_of_audio(audio_file):
+    return librosa.get_duration(filename= audio_file)
     
-    
+def _convert_wav_to_mp3(audio_file, mp3_path):
+    sound = AudioSegment.from_wav(audio_file)
+    sound.export(mp3_path, format="mp3")
+
 def _download_youtube_video(video_url):
     """_summary_
 
@@ -140,17 +153,19 @@ def _download_youtube_video(video_url):
     stream = yt.streams.get_highest_resolution()
 
     # Download the video to the current directory
-    stream.download()
+    stream.download(filename="sample_video.mp4")
     return None
 
 
-def _silent_youtube_video(video_file_path, output_silent_video_path):
+def _silent_youtube_video(video_file_path, output_silent_video_path, duration_in_sec):
     video = VideoFileClip(video_file_path)
+    # Trim the first 5 seconds of the video
+    video = video.subclip(0, duration_in_sec)
     video_without_audio = video.without_audio()
     video_without_audio.write_videofile(output_silent_video_path)
 
 
-def _stitch_audio_to_video(audio_file_path: str, silent_video_file_path: str, output_video_with_dub_path: str):
+def _stitch_audio_to_video(audio_file_path: str, silent_video_file_path: str, dubbed_video_path: str):
     """_summary_
 
     Args:
@@ -162,6 +177,6 @@ def _stitch_audio_to_video(audio_file_path: str, silent_video_file_path: str, ou
     """
     audio = ffmpeg.input(audio_file_path)
     video = ffmpeg.input(silent_video_file_path)
-    ffmpeg.output(audio, video, output_video_with_dub_path).run()
-    
+    ffmpeg.output(audio, video, dubbed_video_path).run()
+
     return None
