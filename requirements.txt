@@ -1,7 +1,9 @@
 flask
-googletrans
+googletrans==4.0.0-rc1
 youtube_transcript_api
 moviepy
 ffmpeg
+ffmpeg-python
 pytube
+pydub
 librosa

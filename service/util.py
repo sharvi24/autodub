@@ -129,7 +129,7 @@ def _combine_align_translated_audios(audio_files_path: str, end_times: list):
     clips = clips[1:]
 
     for clip, end_time in zip(clips, end_times):
-        print(last_length, end_time)
+        #print(last_length, end_time)
         if last_length >= end_time:
             combined_clip += clip
         else:

@@ -9,20 +9,27 @@ app = Flask(__name__)
 def home():
     return "Welcome!"
 
-
+# https://127.0.0.1:5001/dub {raw json} -> 
 @app.route('/dub', methods=['POST'])
 def dub_video():
     data = request.get_json()
     youtube_url = data.get('youtube_url')
     language = data.get('language')
+    
     if not youtube_url:
         return jsonify({'error': 'No youtube url specified'}), 400
 
     if not language:
         return jsonify({'error': 'No language specified'}), 400
+    
     aidub = AIDub()
-    video = aidub.dub(youtube_url, language)
-    # save video
+    status_code = aidub.dub(youtube_url, language)
+    
+    if status_code != 200:
+        return jsonify({'error': "Failed"}), status_code
+    else:
+        return jsonify({'result': "Successfully saved"})
+
 
 
 if __name__ == '__main__':
