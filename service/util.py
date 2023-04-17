@@ -6,8 +6,6 @@ from youtube_transcript_api import YouTubeTranscriptApi
 import ffmpeg
 import json
 import requests
-from Bio.Align import PairwiseAligner
-import librosa
 from pydub import AudioSegment
 import os
 
@@ -27,14 +25,10 @@ def _get_yt_transcripts(url: str):
     N = len(transcript)
     all_text = []
     all_ends = []
-    #all_ends = [0] * (N+1)
     for i in range(N):
         all_text.append(transcript[i]['text'])
         all_ends.append(transcript[i]['start']*1000)
-        #all_ends.append(transcript[i]['duration'])
     return [all_text, all_ends]
-    #     all_ends[i + 1] = all_ends[i] + transcript[i]['duration']
-    # return [all_text, all_ends[1:]]
 
 
 def _translate_en_2_new_lang(text: list, lang: str = 'es'):
@@ -107,23 +101,20 @@ def _combine_align_translated_audios(audio_files_path: str, end_times: list):
         clips.append(clip)
 
     end_times = end_times[0:4]
-    #end_times_in_milsec = [x * 1000 for x in end_times]
 
     # Combine the clips by appending them one after another
     combined_clip = clips[0]
     last_length = len(clips[0])
     
     clips = clips[1:]
-    #print("all end times", end_times)
-    print("all end times in milsec", end_times)
-    
+ 
     for clip, end_time in zip(clips, end_times):
         print(last_length, end_time)
         if last_length >= end_time:
                 combined_clip += clip
         else:
             print("inside adding silence")
-            silence_duration = (end_time - last_length)  #### NOT SURE WHY 1000
+            silence_duration = (end_time - last_length) 
             padded_clip =  clip + AudioSegment.silent(duration=silence_duration)
             combined_clip += padded_clip
             

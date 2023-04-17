@@ -10,8 +10,6 @@ def main():
     
     youtube_url = "https://www.youtube.com/watch?v=G6nxVgoRnXM"
     transcripts, all_ends = _get_yt_transcripts(youtube_url)
-    # [5.56, 4.89, 10.279, 10.53, 4.301] -- direct duration
-    # [5.56, 10.45, 20.729, 31.259, 35.56] -- cummulative duration
     # print(len(transcripts), len(all_ends))
     # print(transcripts[0:5])
     # print(all_ends[0:5])
