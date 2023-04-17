@@ -197,5 +197,5 @@ def _stitch_audio_to_video(audio_file_path: str, silent_video_file_path: str, du
     """
     audio = ffmpeg.input(audio_file_path)
     video = ffmpeg.input(silent_video_file_path)
-    ffmpeg.output(audio, video, dubbed_video_path).run()
+    ffmpeg.output(audio, video, dubbed_video_path)
 

@@ -10,23 +10,23 @@ def main():
     
     youtube_url = "https://www.youtube.com/watch?v=G6nxVgoRnXM"
     
-    transcripts, end_times = _get_yt_transcripts(youtube_url)
-    logging.warn(f'Got transcripts = {transcripts[0:5]} and corresponding end times in millisec= {end_times[0:5]}')
+    # transcripts, end_times = _get_yt_transcripts(youtube_url)
+    # logging.warn(f'Got transcripts = {transcripts[0:5]} and corresponding end times in millisec= {end_times[0:5]}')
     
-    translated_transcripts = _translate_en_2_new_lang(
-        transcripts,
-        'es'
-    )
-    logging.warn(f'Got translated transcripts = {translated_transcripts[0:5]}')
+    # translated_transcripts = _translate_en_2_new_lang(
+    #     transcripts,
+    #     'es'
+    # )
+    # logging.warn(f'Got translated transcripts = {translated_transcripts[0:5]}')
     
     # _translated_tts(translated_transcripts)
     # logging.warn(f'Generated audio clips in target language')
     
-    _combine_align_translated_audios(f'{REPO}/translated_audio_clips', end_times)
-    logging.warn(f'Combined the generated audio clips into a single audio file with alignment and saved as combined.wav')
+    # _combine_align_translated_audios(f'{REPO}/translated_audio_clips', end_times)
+    # logging.warn(f'Combined the generated audio clips into a single audio file with alignment and saved as combined.wav')
     
     duration_in_sec = _duration_of_audio(f'{REPO}/combined.wav')
-    logging.warn(f'The duration of the generated audio file in seconds = {duration_in_sec}')
+    # logging.warn(f'The duration of the generated audio file in seconds = {duration_in_sec}')
     
     _download_youtube_video(youtube_url)
     logging.warn(f'Downloaded the Youtube video as sample_video.mp4')

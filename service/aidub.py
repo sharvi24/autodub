@@ -29,8 +29,8 @@ class AIDub:
         )
         logging.warn(f'Got translated transcripts = {translated_transcripts[0:5]}')
         
-        # _translated_tts(translated_transcripts)
-        # logging.warn(f'Generated audio clips in target language')
+        _translated_tts(translated_transcripts)
+        logging.warn(f'Generated audio clips in target language')
         
         _combine_align_translated_audios(f'{REPO}/translated_audio_clips', end_times)
         logging.warn(f'Combined the generated audio clips into a single audio file with alignment and saved as combined.wav')
