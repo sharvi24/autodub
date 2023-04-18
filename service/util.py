@@ -1,5 +1,5 @@
 from googletrans import Translator
-from moviepy.editor import VideoFileClip
+from moviepy.editor import VideoFileClip, AudioFileClip
 from pydub import AudioSegment
 from pytube import YouTube
 from service.util_constants import *
@@ -112,9 +112,10 @@ def _combine_align_translated_audios(audio_files_path: str, end_times: list):
         glob.glob(f'{REPO}/translated_audio_clips/*.wav'),
         key=os.path.getmtime
     )
-    clip_files = clip_files[0:63]
-    end_times = end_times[0:63]
-    
+    # clip_files = clip_files[0:63]
+    # end_times = end_times[0:63]
+    clip_files = clip_files[0:4]
+    end_times = end_times[0:4]    
     # # Load each audio clip and store the start time in a list
     clips = []
 
@@ -195,7 +196,9 @@ def _stitch_audio_to_video(audio_file_path: str, silent_video_file_path: str, du
         silent_video_file_path (str): path to the video file
         dubbed_video_path (str): path of the combined video to write
     """
-    audio = ffmpeg.input(audio_file_path)
-    video = ffmpeg.input(silent_video_file_path)
-    ffmpeg.output(audio, video, dubbed_video_path)
+    audio = AudioFileClip(audio_file_path)
+    video = VideoFileClip(silent_video_file_path)
+    final_clip = video.set_audio(audio)
+    final_clip.write_videofile(dubbed_video_path)
+
 

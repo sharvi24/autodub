@@ -1,6 +1,6 @@
 from service import AIDub
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
@@ -9,7 +9,7 @@ app = Flask(__name__)
 def home():
     return "Welcome!"
 
-# https://127.0.0.1:5001/dub {raw json} -> 
+
 @app.route('/dub', methods=['POST'])
 def dub_video():
     data = request.get_json()
@@ -28,9 +28,14 @@ def dub_video():
     if status_code != 200:
         return jsonify({'error': "Failed"}), status_code
     else:
-        return jsonify({'result': "Successfully saved"})
+        #return jsonify({'result': "Successfully saved"})
+        return render_template('stream.html', video_file='output_video.mp4')
+
+@app.route('/video', methods=['GET'])
+def stream_video():
+    return render_template('stream.html', video_file='output_video.mp4')
 
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=5002)
