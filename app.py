@@ -29,13 +29,13 @@ def dub_video():
         return jsonify({'error': "Failed"}), status_code
     else:
         #return jsonify({'result': "Successfully saved"})
-        return render_template('stream.html', video_file='output_video.mp4')
+        return render_template('stream.html', video_file='dubbed_video.mp4')
+
 
 @app.route('/video', methods=['GET'])
 def stream_video():
-    return render_template('stream.html', video_file='output_video.mp4')
-
+    return render_template('stream.html', video_file='dubbed_video.mp4')
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5002)
+    app.run(host='0.0.0.0', port=5001)
